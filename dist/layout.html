@@ -1,0 +1,44 @@
+{{ define "layout" }}
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Short Lived Links">
+    <meta name="author" content="Jesus Tovar">
+
+    <title>Expiring Links</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Adjusted font-family */
+            text-align: center;
+            background-color: #f8f9fa; /* Adjusted background color to a light gray */
+            color: #444; /* Adjusted text color */
+        }
+        h1 {
+            font-size: 2rem;
+            color: #007bff; /* Adjusted heading color to blue */
+        }
+        h2 {
+            color: #007bff; /* Adjusted heading color to blue */
+        }
+    </style>
+    
+    {{ template "header" . }}
+</head>
+
+<body>
+    <header>
+        <h1>Expiring Link</h1>
+        <h2>Share passwords and files with short lived links</h2>
+    </header>
+    <main>
+        {{ template "content" . }}
+    </main>
+    <footer>
+    </footer>
+</body>
+</html>
+{{ end }}

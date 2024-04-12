@@ -1,0 +1,72 @@
+{{ define "header" }}
+<style>
+    label, textarea, button {
+        display: block;
+    }
+    label {
+        font-size: 1.1rem;
+    }
+    textarea {
+        box-sizing: border-box;
+        min-width: 300px;
+        width: 80%;
+        height: 30vmax;
+        margin: 1rem auto;
+        border: 2px solid #007bff; /* Adjusted color to ChatGPT blue */
+        border-radius: 5px;
+        font-family: Arial, sans-serif; /* Adjusted font */
+        font-size: 1rem;
+        padding: 0.5rem; /* Adjusted padding */
+    }
+    button {
+        box-sizing: border-box;
+        width: 300px;
+        margin: 2rem auto;
+        background: #007bff; /* Adjusted color to ChatGPT blue */
+        color: #fff;
+        padding: 1rem;
+        font-size: 1rem;
+        font-family: Arial, sans-serif; /* Adjusted font */
+        font-weight: 600;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #0056b3; /* Adjusted color on hover */
+    }
+    form > div {
+        max-width: 300px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        padding: 5px;
+    }
+    form > div > input {
+        margin-right: 10px;
+    }
+    form > div > label {
+        font-size: 1rem;
+    }
+</style>
+{{ end }}
+
+{{ define "content" }}
+
+<form method="POST" action="/" enctype="multipart/form-data">
+    <label for="message">Note:</label>
+    <textarea id="message" name="message"></textarea>
+    <input type="file" id="fileInput" name="fileInput" accept="image/*,.txt,.pdf,.ods,.docx,.zip,.tar.gz,.7z">
+    <div>
+        <input type="radio" id="ttl24h" name="ttl" value="24h" checked>
+        <label for="ttl24h">Delete after 24 hours</label>
+    </div>
+    <div>
+        <input type="radio" id="ttlUntilRead" name="ttl" value="untilRead">
+        <label for="ttlUntilRead">Delete after reading</label>
+    </div>
+    <button type="submit">Create note</button>
+</form>
+
+{{ end }}
