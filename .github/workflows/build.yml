@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROJECT: jatm80
-      IMAGE: expiring-link
+      IMAGE: expiring-links
     steps:
       - name: Checkout
         uses: actions/checkout@v2
