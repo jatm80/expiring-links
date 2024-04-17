@@ -2,7 +2,7 @@
 
 Go app to create links that expire after a while.
 
-For testing use the following Docker compose:
+## For local testing use the following Docker compose:
 
 ```
 services:
@@ -20,5 +20,10 @@ services:
     depends_on:
       - db
 ```
+
+## For kubernetes deployment:
+- cd deploy/
+- helm dependency update expiring-links
+- helm install expiring-links expiring-links
 
 Inspired by [dustinmoris/self-destruct-notes](https://github.com/dustinmoris/self-destruct-notes)

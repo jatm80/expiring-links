@@ -1,0 +1,14 @@
+apiVersion: v2
+name: expiring-links
+description: A Helm chart for deploying expiring-links
+type: application
+version: 0.2.0
+appVersion: "0.2.0"
+dependencies:
+- condition: redis.enabled
+  name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.x.x
+maintainers:
+- name: JATM
+  url: https://github.com/jatm80/expiring-links
