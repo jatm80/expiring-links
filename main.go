@@ -245,11 +245,25 @@ func (s *Server) handlePOST(
 
 	w.WriteHeader(http.StatusOK)
 	noteURL := fmt.Sprintf("%s/%s", s.BaseURL, key)
+
+
+	data := map[string]string{
+		"Share via Email":    fmt.Sprintf("mailto:?subject=Secure%%20Link&body=%s",noteURL),
+		"Share via Facebook": fmt.Sprintf("https://www.facebook.com/sharer/sharer.php?u=%s",noteURL),
+		"Share via Twitter":  fmt.Sprintf("https://twitter.com/intent/tweet?url=%s&text=Secure%%20Link",noteURL),
+		"Share via WhatsApp": fmt.Sprintf("https://api.whatsapp.com/send?text=Secure%%20Link:%%20%s",noteURL),
+		"Share via Telegram": fmt.Sprintf("https://t.me/share/url?url=%s&text=Secure%%20Link",noteURL),
+	}
+
+	htmlShareLinks := fmt.Sprintf("<a href='%s'>%s</a>", noteURL, noteURL)
+	for t, l := range data{
+      htmlShareLinks = htmlShareLinks + fmt.Sprintf("<p><a href='%s' target='_blank'>%s</a></p>",l,t)
+	}
+
 	s.renderMessage(
 		w, r,
 		"Note was successfully created",
-		template.HTML(
-			fmt.Sprintf("<a href='%s'>%s</a>", noteURL, noteURL)))
+		template.HTML(htmlShareLinks))
 }
 
 func (s *Server) handleGET(
