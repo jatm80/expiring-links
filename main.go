@@ -173,7 +173,7 @@ func (s *Server) handlePOST(
 		key = vars["idx"]
 	}
 
-	err := r.ParseMultipartForm(10 << 20)
+	err := r.ParseMultipartForm(1024 << 20)
 	if err != nil {
 		s.responseError(
 			w, r,
