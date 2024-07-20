@@ -54,10 +54,10 @@
 
 {{ define "content" }}
 
-<form method="POST" action="/" enctype="multipart/form-data">
+<form method="POST" action="/{{ .NoteId }}" enctype="multipart/form-data">
     <label for="message">Note:</label>
     <textarea id="message" name="message"></textarea>
-    <input type="file" id="fileInput" name="fileInput" accept="image/*,.txt,.pdf,.ods,.docx,.zip,.tar.gz,.7z">
+    <input type="file" id="fileInput" name="fileInput">
     <div>
         <input type="radio" id="ttl24h" name="ttl" value="24h" checked>
         <label for="ttl24h">Delete after 24 hours</label>

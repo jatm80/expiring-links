@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -16,6 +15,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
+
+type Error struct {
+	Message string
+	Code int
+}
 
 type Data interface {
 	IsDestructive() bool
@@ -80,9 +84,10 @@ func main() {
 
     r := mux.NewRouter()
 	r.StrictSlash(false)
-	r.HandleFunc("/",server.handleGET).Methods("GET")
 	r.HandleFunc("/{idx}",server.handleGET).Methods("GET")
+	r.HandleFunc("/",server.handleGET).Methods("GET")
 	r.HandleFunc("/download/{idx}",server.handleDownload).Methods("GET")
+	r.HandleFunc("/{idx}",server.handlePOST).Methods("POST")
 	r.HandleFunc("/",server.handlePOST).Methods("POST")
 
 	r.NotFoundHandler = http.HandlerFunc(server.notFound)
@@ -162,6 +167,12 @@ func (s *Server) handlePOST(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	vars := mux.Vars(r)
+	key := uuid.NewString()
+	if len(vars) > 0 {
+		key = vars["idx"]
+	}
+
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		s.responseError(
@@ -192,9 +203,6 @@ func (s *Server) handlePOST(
 		TextData: []byte(message),
 		Destruct: destruct,
 	}
-
-
-	key := uuid.NewString()
 
 	if attachment != nil {
 		defer attachment.Close()
@@ -273,7 +281,11 @@ func (s *Server) handleGET(
 	path := r.URL.Path
 	if path == "/" {
 		s.renderTemplate(
-			w, r, nil,
+			w, r, struct {
+				NoteId string
+			}{
+				NoteId: "",
+			},
 			"layout",
 			"dist/layout.html",
 			"dist/index.html")
@@ -287,10 +299,22 @@ func (s *Server) handleGET(
 	err := getData(s,ctx,noteID,note)
 
 	if err != nil {
-		s.responseError(
-			w, r,
-			http.StatusInternalServerError,
-			err.Error())
+		if err.Code == 404 {
+			s.renderTemplate(
+				w, r, struct {
+					NoteId string
+				}{
+					NoteId: noteID,
+				},
+				"layout",
+				"dist/layout.html",
+				"dist/index.html")
+		} else {
+			s.responseError(
+				w, r,
+				err.Code,
+				err.Message)
+		}
 		return
 	}
 
@@ -325,8 +349,8 @@ func (s *Server) handleDownload(
 	if err != nil {
 		s.responseError(
 			w, r,
-			http.StatusInternalServerError,
-			err.Error())
+			err.Code,
+			err.Message)
 		return
 	}
 
@@ -335,14 +359,17 @@ func (s *Server) handleDownload(
 	w.Write(file.FileData)
 }
 
-func getData(s *Server, ctx context.Context, noteID string, data Data) (error) {
+func getData(s *Server, ctx context.Context, noteID string, data Data) (*Error) {
 
 	err := s.RedisCache.GetSkippingLocalCache(
 		ctx,
 		noteID,
 		&data)
 	if err != nil {
-		return errors.New(http.StatusText(404))
+		return &Error{
+			Message: http.StatusText(404),
+			Code: 404,
+		}
 	}
 
 	switch v := data.(type) {
@@ -350,11 +377,17 @@ func getData(s *Server, ctx context.Context, noteID string, data Data) (error) {
 		if v.IsDestructive() {
 			err := s.RedisCache.Delete(ctx, noteID)
 			if err != nil {
-				return errors.New(http.StatusText(500))
+				return  &Error{
+					Message: http.StatusText(500),
+					Code: 500,
+				}
 			}
 		}
 	default:
-		return errors.New(http.StatusText(500))
+		return &Error{
+			Message: http.StatusText(500),
+			Code: 500,
+		}
 	}
 
 	return nil
